@@ -1,6 +1,7 @@
 import { pipe } from 'fp-ts/function';
 
 import type { InfiniteList } from '../InfiniteList';
+import * as InfiniteList_ from '../InfiniteList';
 import type { List } from '../List';
 import * as List_ from '../List';
 import type { NonEmptyList } from '../NonEmptyList';
@@ -30,7 +31,9 @@ describe('List', () => {
       expect(array).toStrictEqual([123, 456]);
     });
     it('should destruct an empty List', async () => {
-      const list: List<number> = function* () { return };
+      const list: List<number> = function* () {
+        return;
+      };
       const array: Array<number> = List_.toArray(list);
       expect(array).toStrictEqual([]);
     });
@@ -67,6 +70,17 @@ describe('List', () => {
       const expected = input.map(double);
       expect(result).toStrictEqual(expected);
     });
+  });
+
+  describe('chain function', () => {
+    const input = [1, 2, 3];
+    const result = pipe(
+      input,
+      List_.fromArray,
+      List_.chain((n: number) => pipe(InfiniteList_.of(n), List_.take(n))),
+      List_.toArray,
+    );
+    expect(result).toStrictEqual([1, 2, 2, 3, 3, 3]);
   });
 
   describe('take function', () => {
