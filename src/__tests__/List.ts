@@ -4,6 +4,7 @@ import type { InfiniteList } from '../InfiniteList';
 import type { List } from '../List';
 import * as List_ from '../List';
 import type { NonEmptyList } from '../NonEmptyList';
+import * as InfiniteList_ from '../InfiniteList';
 
 describe('List', () => {
   describe('type', () => {
@@ -67,6 +68,20 @@ describe('List', () => {
       const expected = input.map(double);
       expect(result).toStrictEqual(expected);
     });
+  });
+
+  describe('chain function', () => {
+      const input = [1, 2, 3];
+      const result = pipe(
+        input,
+        List_.fromArray,
+        List_.chain((n: number) => pipe(
+          InfiniteList_.of(n),
+          List_.take(n),
+        )),
+        List_.toArray,
+      );
+      expect(result).toStrictEqual([1, 2, 2, 3, 3, 3]);
   });
 
   describe('take function', () => {

@@ -1,3 +1,4 @@
+
 export type List<A> = () => Generator<A, unknown, undefined>;
 
 export function of<A>(a: A): List<A> {
@@ -25,6 +26,21 @@ export function map<A, B>(f: (a: A) => B): (la: List<A>) => List<B> {
         yield f(a);
       }
     };
+}
+
+export function chain<A, B>(f: (a: A) => List<B>): (la: List<A>) => List<B> {
+  return (la) => function* () {
+    const ha = la();
+    while (true) {
+      const { done, value } = ha.next();
+      if (done) {
+        return;
+      }
+      const lb = f(value)
+      const hb = lb();
+      yield* hb;
+    }
+  }
 }
 
 export function take(n: number): <A>(la: List<A>) => List<A> {
